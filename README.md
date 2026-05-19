@@ -50,8 +50,15 @@ databricks-dataplay-bundles/
 │   └── bundle-deploy.yml       # main push: validate + deploy + 알림
 └── docs/
     ├── handson/                # 단계별 실습 가이드
+    │   ├── 01-azure-prereq.md      # Azure 사전작업 (FC 등록)
+    │   ├── 02-bundle-setup.md      # 번들 골격 + 스키마 자동완성
+    │   └── 03-cicd-deploy.md       # 워크플로우 + GitHub 설정 + 배포 검증
     └── reference/              # 개념 설명
+        ├── azure-sp-oidc-federation.md   # SP/OIDC/Federation 원리
+        └── databricks-asset-bundles.md   # DAB 개념·구성
 ```
+
+> 처음이면 `handson/01 → 02 → 03` 순서로, 개념이 궁금하면 `reference/` 를 곁들여 읽으세요.
 
 ---
 
