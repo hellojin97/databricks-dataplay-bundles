@@ -9,12 +9,27 @@ Azure Databricks 워크스페이스(`dbw-dataplay-lab-kc`)에 **Databricks Asset
 ## 동작 개요
 
 ```mermaid
-flowchart LR
-    PR[Pull Request] -->|bundle-validate.yml| V[databricks bundle validate]
-    M[main push] -->|bundle-deploy.yml| D[validate + deploy]
-    V -.OIDC.-> AAD[Azure AD]
-    D -.OIDC.-> AAD
-    AAD --> WS[(Databricks 워크스페이스)]
+flowchart TB
+    subgraph GH["GitHub · databricks-dataplay-bundles"]
+        PR["PR 열림"] -->|bundle-validate.yml| V["bundle validate<br/>(읽기전용)"]
+        MN["main push"] -->|bundle-deploy.yml| DP["bundle validate + deploy"]
+    end
+
+    subgraph AUTH["인증 · 시크릿 없음"]
+        OIDC["GitHub OIDC 토큰"] --> AAD{"Azure AD<br/>federated credential 검증"}
+        AAD -->|통과| TOK["SP 임시 토큰"]
+    end
+
+    V -.OIDC.-> OIDC
+    DP -.OIDC.-> OIDC
+    TOK --> WS[("Azure Databricks<br/>dbw-dataplay-lab-kc")]
+    DP ==>|잡·파이프라인 배포| WS
+    DP --> DC["Discord 알림"]
+
+    AZ["azure-infra · Terraform"] -. 워크스페이스 자체 프로비저닝 .-> WS
+
+    classDef infra fill:#eee,stroke:#999,color:#333;
+    class AZ infra
 ```
 
 - **PR**: `databricks bundle validate` (읽기전용 검증)
@@ -35,30 +50,10 @@ flowchart LR
 
 ---
 
-## 레포 구조
+## 문서
 
-```text
-databricks-dataplay-bundles/
-├── databricks.yml              # 번들 정의 (타깃 lab, 워크스페이스 host)
-├── bundle_config_schema.json   # VSCode 자동완성 스키마 (커밋함)
-├── resources/                  # 잡/파이프라인 정의 *.yml
-│   └── example_job.yml
-├── src/                        # 잡 실행 코드
-│   └── example.py
-├── .github/workflows/
-│   ├── bundle-validate.yml     # PR: validate
-│   └── bundle-deploy.yml       # main push: validate + deploy + 알림
-└── docs/
-    ├── handson/                # 단계별 실습 가이드
-    │   ├── 01-azure-prereq.md      # Azure 사전작업 (FC 등록)
-    │   ├── 02-bundle-setup.md      # 번들 골격 + 스키마 자동완성
-    │   └── 03-cicd-deploy.md       # 워크플로우 + GitHub 설정 + 배포 검증
-    └── reference/              # 개념 설명
-        ├── azure-sp-oidc-federation.md   # SP/OIDC/Federation 원리
-        └── databricks-asset-bundles.md   # DAB 개념·구성
-```
-
-> 처음이면 `handson/01 → 02 → 03` 순서로, 개념이 궁금하면 `reference/` 를 곁들여 읽으세요.
+- 실습: [handson/01-azure-prereq](docs/handson/01-azure-prereq.md) → [02-bundle-setup](docs/handson/02-bundle-setup.md) → [03-cicd-deploy](docs/handson/03-cicd-deploy.md)
+- 개념: [reference/azure-sp-oidc-federation](docs/reference/azure-sp-oidc-federation.md) · [reference/databricks-asset-bundles](docs/reference/databricks-asset-bundles.md)
 
 ---
 
