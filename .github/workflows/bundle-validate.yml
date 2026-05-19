@@ -1,0 +1,28 @@
+name: Bundle Validate
+on:
+    pull_request:
+        paths:
+            - "databricks.yml"
+            - "resources/**"
+            - "src/**"
+            - "bundle_config_schema.json"
+            - ".github/workflows/bundle-validate.yml"
+permissions: 
+    id-token: write
+    contents: read
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        env:
+            DATABRICKS_AUTH_TYPE: azure-cli
+        steps:
+            - uses: actions/checkout@v4
+            - uses: azure/login@v2
+              with:
+                client-id:          ${{ vars.AZURE_CLIENT_ID }}
+                tenant-id:          ${{ vars.AZURE_TENANT_ID }}
+                subscription-id:    ${{ vars.AZURE_SUBSCRIPTION_ID }}
+            - uses: databricks/setup-cli@main
+            - run: databricks bundle validate --target lab
+    

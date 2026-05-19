@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=./bundle_config_schema.json
+bundle:
+  name: dataplay-bundles
+
+# resources/ 아래 모든 *.yml을 번들에 자동 포함
+include:
+  - resources/*.yml
+  - resources/**/*.yml
+
+targets:
+  lab:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405613177889652.12.azuredatabricks.net/
