@@ -5,9 +5,12 @@ on:
             - "databricks.yml"
             - "resources/**"
             - "src/**"
+            - "configuration/**"
+            - "pyproject.toml"
+            - "uv.lock"
             - "bundle_config_schema.json"
             - ".github/workflows/bundle-validate.yml"
-permissions: 
+permissions:
     id-token: write
     contents: read
 
@@ -23,6 +26,15 @@ jobs:
                 client-id:          ${{ vars.AZURE_CLIENT_ID }}
                 tenant-id:          ${{ vars.AZURE_TENANT_ID }}
                 subscription-id:    ${{ vars.AZURE_SUBSCRIPTION_ID }}
+            # pydabs(=databricks-bundles) 로 정의된 Job 을 평가하려면 .venv 가 필요하다.
+            # databricks.yml 의 `python.venv_path: .venv` 가 본 venv 를 가리킨다.
+            - uses: actions/setup-python@v5
+              with:
+                python-version: "3.12"
+            - uses: astral-sh/setup-uv@v3
+              with:
+                enable-cache: true
+            - run: uv sync --frozen
             - uses: databricks/setup-cli@main
             - run: databricks bundle validate --target lab
     

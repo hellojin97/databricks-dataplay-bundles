@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=../bundle_config_schema.json
+#
+# wikimedia-dataplay 도메인의 Unity Catalog 자산을 DAB 1급 리소스로 코드 정의 (FR-005, FR-009).
+# 카탈로그 이름은 사용자 지정 `wikimedia-dataplay` 그대로 사용 (Unity Catalog 식별자에 하이픈
+# 허용). 본 번들 내부에서 참조하는 리소스 키는 영문 snake_case (`wikimedia_dataplay`).
+#
+# 본 파일은 `databricks.yml` 의 `include` 가 `configuration/*.yml` 패턴으로 자동 포함한다.
+#
+# 첫 deploy 시 워크스페이스 SP 에 `CREATE CATALOG` 권한이 없으면 catalogs 블록이 실패할 수
+# 있다 (spec.md Assumptions "카탈로그 사전조건" 참조). 그 경우 본 파일의 catalogs 블록만 임시
+# 주석 처리하고 schema/volume 만 배포하는 fallback 가능.
+
+resources:
+  catalogs:
+    wikimedia_dataplay:
+      name: wikimedia-dataplay
+      comment: "Wikimedia 활동(편집·이벤트) 적재 데이터의 도메인 카탈로그."
+
+  schemas:
+    bronze:
+      catalog_name: ${resources.catalogs.wikimedia_dataplay.name}
+      name: bronze
+      comment: "원본 페이로드 보존 영역(medallion 아키텍처의 bronze 레이어)."
+
+  volumes:
+    recentchanges_raw:
+      catalog_name: ${resources.catalogs.wikimedia_dataplay.name}
+      schema_name: ${resources.schemas.bronze.name}
+      name: recentchanges_raw
+      volume_type: MANAGED
+      comment: "MediaWiki RecentChanges 의 5분 슬롯 NDJSON+gzip 적재 파일 보관 볼륨."

@@ -2,14 +2,26 @@
 bundle:
   name: dataplay-bundles
 
-# resources/ 아래 모든 *.yml을 번들에 자동 포함
+# Python(pydabs) 으로 정의된 리소스 진입점 — `resources/__init__.py` 의 `load_resources`.
+# `venv_path` 는 uv 가 만든 `.venv` 를 가리켜 DAB CLI 가 databricks-bundles 를 import 한다.
+python:
+  venv_path: .venv
+  resources:
+    - "resources:load_resources"
+
+# YAML 정의도 함께 머지 — example_job.yml, configuration/catalogs.yml 등.
 include:
   - resources/*.yml
   - resources/**/*.yml
+  - configuration/*.yml
+  - configuration/**/*.yml
 
 targets:
   lab:
-    mode: development
+    # mode 를 명시적으로 두지 않음 — dev 모드의 자동 prefix·schedule 일시정지가 적용되지 않도록.
+    # 본 워크스페이스(`dbw-dataplay-lab-kc`) 가 단일 운영 타깃이고 wikimedia_recentchanges 의 */5
+    # cron 이 실제로 동작해야 하므로 (FR-002), dev 격리 컨벤션 대신 정식 리소스 이름과 활성 스케줄을
+    # 사용한다. README 의 dev prefix 설명은 본 결정에 따라 정정됨.
     default: true
     workspace:
       host: https://adb-7405613177889652.12.azuredatabricks.net/
