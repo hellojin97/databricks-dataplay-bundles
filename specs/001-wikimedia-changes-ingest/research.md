@@ -158,6 +158,12 @@ include:
   뒤 본 번들은 schema/volume 만 관리하도록 catalog 블록을 임시 주석 처리하는 fallback 을 README
   에 명시한다.
 
+**Deployment engine 요구사항 (2026-05-22 머지 후 노출)**:
+- `resources.catalogs.*` 는 DAB 의 **direct deployment 엔진** 에서만 동작한다. CI 의 두 워크플로
+  (`bundle-validate.yml` / `bundle-deploy.yml`) `env` 에 `DATABRICKS_BUNDLE_ENGINE: direct` 설정
+  필요. 없으면 `Error: Catalog resources are only supported with direct deployment mode` 로 실패.
+- 로컬에서도 `databricks bundle deploy` 전에 `export DATABRICKS_BUNDLE_ENGINE=direct` 필요.
+
 **Alternatives considered**:
 - 자산 정의를 `resources/catalogs.yml` 에 두기: include 패턴이 이미 잡혀있어 편리하나 사용자 명시
   요청을 위배. 기각.
