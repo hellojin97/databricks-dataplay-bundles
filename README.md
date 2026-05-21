@@ -54,6 +54,9 @@ flowchart TB
 
 - 실습: [handson/01-azure-prereq](docs/handson/01-azure-prereq.md) → [02-bundle-setup](docs/handson/02-bundle-setup.md) → [03-cicd-deploy](docs/handson/03-cicd-deploy.md)
 - 개념: [reference/azure-sp-oidc-federation](docs/reference/azure-sp-oidc-federation.md) · [reference/databricks-asset-bundles](docs/reference/databricks-asset-bundles.md)
+- 헌법: [.specify/memory/constitution.md](.specify/memory/constitution.md) (v1.0.0)
+- 기능 명세 (spec-kit):
+  - `001-wikimedia-changes-ingest` — [spec](specs/001-wikimedia-changes-ingest/spec.md) · [plan](specs/001-wikimedia-changes-ingest/plan.md) · [tasks](specs/001-wikimedia-changes-ingest/tasks.md) · [quickstart](specs/001-wikimedia-changes-ingest/quickstart.md)
 
 ---
 

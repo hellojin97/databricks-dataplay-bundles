@@ -2,14 +2,21 @@
 bundle:
   name: dataplay-bundles
 
-# resources/ 아래 모든 *.yml을 번들에 자동 포함
+# resources/ 의 잡·파이프라인 정의와 configuration/ 의 카탈로그·스키마·볼륨 정의를 모두 자동 포함
 include:
   - resources/*.yml
   - resources/**/*.yml
+  - configuration/*.yml
+  - configuration/**/*.yml
 
 targets:
   lab:
     mode: development
     default: true
+    # mode:development 의 (a) 스케줄 자동 일시정지, (b) UC schema 이름에 dev prefix 부여를 해제
+    # → wikimedia_recentchanges 잡의 */5 cron 이 실제 동작하고 schema 이름이 `bronze` 그대로 유지된다.
+    presets:
+      trigger_pause_status: UNPAUSED
+      skip_name_prefix_for_schema: true
     workspace:
       host: https://adb-7405613177889652.12.azuredatabricks.net/
