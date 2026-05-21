@@ -1,6 +1,9 @@
 # yaml-language-server: $schema=./bundle_config_schema.json
 bundle:
   name: dataplay-bundles
+  # resources.catalogs.* 는 direct deployment 엔진에서만 동작 — bundle 레벨에서 명시.
+  # 환경변수 DATABRICKS_BUNDLE_ENGINE 보다 우선. 참고: docs.databricks.com/dev-tools/bundles/direct
+  engine: direct
 
 # Python(pydabs) 으로 정의된 리소스 진입점 — `resources/__init__.py` 의 `load_resources`.
 # `venv_path` 는 uv 가 만든 `.venv` 를 가리켜 DAB CLI 가 databricks-bundles 를 import 한다.

@@ -159,10 +159,10 @@ include:
   에 명시한다.
 
 **Deployment engine 요구사항 (2026-05-22 머지 후 노출)**:
-- `resources.catalogs.*` 는 DAB 의 **direct deployment 엔진** 에서만 동작한다. CI 의 두 워크플로
-  (`bundle-validate.yml` / `bundle-deploy.yml`) `env` 에 `DATABRICKS_BUNDLE_ENGINE: direct` 설정
-  필요. 없으면 `Error: Catalog resources are only supported with direct deployment mode` 로 실패.
-- 로컬에서도 `databricks bundle deploy` 전에 `export DATABRICKS_BUNDLE_ENGINE=direct` 필요.
+- `resources.catalogs.*` 는 DAB 의 **direct deployment 엔진** 에서만 동작한다 (기본은 terraform).
+- 본 레포는 `databricks.yml` 의 `bundle.engine: direct` 로 명시 — schema 상 본 필드가 환경변수
+  `DATABRICKS_BUNDLE_ENGINE` 보다 우선이라 CLI 버전과 무관하게 결정적으로 동작한다.
+- env 변수 방식은 1차 시도에서 적용이 안 돼 (런타임에서 무시) 폐기, 본 yaml 방식으로 정착.
 
 **Alternatives considered**:
 - 자산 정의를 `resources/catalogs.yml` 에 두기: include 패턴이 이미 잡혀있어 편리하나 사용자 명시

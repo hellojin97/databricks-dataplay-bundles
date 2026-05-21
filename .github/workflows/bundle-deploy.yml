@@ -26,9 +26,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             DATABRICKS_AUTH_TYPE: azure-cli
-            # resources.catalogs 는 DAB 의 direct deployment 엔진에서만 지원.
-            # 참고: https://docs.databricks.com/dev-tools/bundles/direct
-            DATABRICKS_BUNDLE_ENGINE: direct
+            # 참고: deployment engine 은 databricks.yml 의 bundle.engine=direct 로 명시 (env 보다 우선).
         steps:
             - uses: actions/checkout@v4
             - uses: azure/login@v2
