@@ -86,7 +86,7 @@ description: "Task list for 001-wikimedia-changes-ingest"
 - [X] T017 [US1] `src/dataplay/wikimedia/writer.py` 작성 — `BronzeVolumeWriter` 클래스(`/Volumes/...` 경로용) + `LocalDirectoryWriter` 클래스(테스트용, 동일 인터페이스). `write_window(window, events) -> IngestResult` 가 NDJSON+gzip stream write 후 `_SUCCESS` 파일 생성. T014 선행.
 - [X] T018 [US1] `src/dataplay/wikimedia/pipeline.py` 작성 — `IngestResult` dataclass + `orchestrate(config, now, source, writer) -> IngestResult` 합성 함수. T014–T017 선행. SparkSession 받지 않음(헌법 IV N/A 케이스, plan Complexity #1 참조).
 - [X] T019 [US1] `src/dataplay/jobs/wikimedia_recentchanges.py` 작성 — 태스크 엔트리포인트(호출부 only, ≤ 50 줄). `argparse` 로 `--volume-root` / `--user-agent` / `--override-window-start` 파라미터 파싱 → `IngestionConfig` 생성 → `requests.Session` + `MediaWikiRecentChangesClient` + `BronzeVolumeWriter` 생성 → `orchestrate(...)` 호출 → 결과 stdout 출력. 헌법 II 의 "호출부" 정의 준수.
-- [X] T020 [US1] `resources/jobs/wikimedia_recentchanges.yml` 신규 — 서버리스 Python task, `quartz_cron_expression: "0 */5 * * * ?"`, `timezone_id: UTC`, `max_concurrent_runs: 1`, environment_version "2" + dependencies (requests, pydantic). [research.md R7](./research.md#r7-잡-정의-resourcesjobswikimedia_recentchangesyml--databricksyml-의-lab-presets) 의 YAML 골자 그대로.
+- [X] T020 [US1] `resources/jobs/wikimedia_recentchanges.py` (pydabs) — `databricks-bundles` Python DSL 로 `Job(...)` 정의. 서버리스 Python task + cron `*/5` + `environment_version="2"` + dependencies. 함께 `resources/__init__.py` 의 `load_resources` 진입점과 `databricks.yml` 의 `python.resources` 설정이 필요. [research.md R7](./research.md#r7-잡-정의-resourcesjobswikimedia_recentchangespy-pydabs--databricksyml-의-lab-presets) 참조. (2026-05-22 YAML → pydabs 전환.)
 
 **Checkpoint US1**: 
 - `uv run pytest -q` 전체 통과

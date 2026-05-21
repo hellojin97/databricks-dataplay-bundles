@@ -2,7 +2,14 @@
 bundle:
   name: dataplay-bundles
 
-# resources/ 의 잡·파이프라인 정의와 configuration/ 의 카탈로그·스키마·볼륨 정의를 모두 자동 포함
+# Python(pydabs) 으로 정의된 리소스 진입점 — `resources/__init__.py` 의 `load_resources`.
+# `venv_path` 는 uv 가 만든 `.venv` 를 가리켜 DAB CLI 가 databricks-bundles 를 import 한다.
+python:
+  venv_path: .venv
+  resources:
+    - "resources:load_resources"
+
+# YAML 정의도 함께 머지 — example_job.yml, configuration/catalogs.yml 등.
 include:
   - resources/*.yml
   - resources/**/*.yml

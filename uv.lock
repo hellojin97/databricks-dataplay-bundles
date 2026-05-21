@@ -147,6 +147,15 @@ wheels = [
 ]
 
 [[package]]
+name = "databricks-bundles"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/3c/3fa962083447025bd83014433b1fa8eb833ad33222d8024167de3f545b32/databricks_bundles-1.0.0.tar.gz", hash = "sha256:8ba529a5eef5b5ba068eb0a3e42d64b4a4e98dbee57be899617c9ba5062fc5fe", size = 98565, upload-time = "2026-05-21T08:15:20.756Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/28/9c/bae20f3327cd1139978c5154c0f9dd7665e7969b6fc58cf9486b6cb8c7ad/databricks_bundles-1.0.0-py3-none-any.whl", hash = "sha256:8ee7dfae3e055d5769e8dcc8ea94b843cc8b97a3194490a81ff461e53fd14797", size = 203975, upload-time = "2026-05-21T08:15:19.168Z" },
+]
+
+[[package]]
 name = "dataplay-bundles"
 version = "0.1.0"
 source = { editable = "." }
@@ -158,6 +167,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "black" },
+    { name = "databricks-bundles" },
     { name = "pytest" },
     { name = "responses" },
     { name = "ruff" },
@@ -172,6 +182,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "black", specifier = ">=24" },
+    { name = "databricks-bundles", specifier = ">=1.0.0" },
     { name = "pytest", specifier = ">=8" },
     { name = "responses", specifier = ">=0.25" },
     { name = "ruff", specifier = ">=0.6" },

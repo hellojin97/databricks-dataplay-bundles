@@ -162,15 +162,22 @@ include:
 - 자산 정의를 `resources/catalogs.yml` 에 두기: include 패턴이 이미 잡혀있어 편리하나 사용자 명시
   요청을 위배. 기각.
 
-## R7. 잡 정의 (`resources/jobs/wikimedia_recentchanges.yml`) + `databricks.yml` 의 lab presets
+## R7. 잡 정의 (`resources/jobs/wikimedia_recentchanges.py`, pydabs) + `databricks.yml` 의 lab presets
 
-**Decision**: 기존 `example_job.yml` 동일 패턴 — 서버리스 Python task + cron 트리거. **단,
-`databricks.yml` 의 `lab` target 에 `presets` 를 추가해야 본 cron 이 실제 동작한다** (advisor
-점검 결과).
+**Decision (revised 2026-05-22)**: 헌법 원칙 I 의 "pydabs 우선" 정책에 따라 잡 정의를
+**`databricks-bundles` Python DSL** 로 작성한다. 서버리스 Python task + cron 트리거의 구조는
+동일하되, YAML 대신 Python 객체로 표현되어 타입 안전·합성·동일 toolchain(ruff/black) 사용이
+가능해진다. **`databricks.yml` 의 `lab` target 에 `presets`** 를 추가해야 본 cron 이 실제 동작
+한다 (advisor 점검 결과; mode:development 의 자동 pause 해제).
 
-`databricks.yml` 의 `lab` target 수정 골자:
+`databricks.yml` 의 `lab` target + pydabs 진입점 골자:
 
 ```yaml
+python:
+  venv_path: .venv
+  resources:
+    - "resources:load_resources"
+
 targets:
   lab:
     mode: development
@@ -182,35 +189,43 @@ targets:
       host: https://adb-7405613177889652.12.azuredatabricks.net/
 ```
 
-`resources/jobs/wikimedia_recentchanges.yml`:
+`resources/jobs/wikimedia_recentchanges.py` (pydabs):
 
-```yaml
-resources:
-  jobs:
-    wikimedia_recentchanges:
-      name: wikimedia_recentchanges
-      schedule:
-        # Databricks 는 Quartz 6필드 cron 사용. 본 표현은 매 5분 정각(초 0).
-        # (spec 의 5필드 `*/5 * * * *` 는 표준 cron 약식 표기.)
-        quartz_cron_expression: "0 */5 * * * ?"
-        timezone_id: UTC
-        pause_status: UNPAUSED                     # presets 와 함께 명시
-      max_concurrent_runs: 1
-      tasks:
-        - task_key: ingest
-          spark_python_task:
-            python_file: ../src/dataplay/jobs/wikimedia_recentchanges.py
-          environment_key: default
-      environments:
-        - environment_key: default
-          spec:
-            environment_version: "2"
-            dependencies:
-              - "requests>=2.32,<3"
-              - "pydantic>=2.7,<3"
-      email_notifications:
-        on_failure: []                             # Discord webhook 은 후속 PR (US3, P3)
+```python
+from databricks.bundles.jobs import (
+    CronSchedule, Environment, Job, JobEmailNotifications,
+    JobEnvironment, PauseStatus, SparkPythonTask, Task,
+)
+
+wikimedia_recentchanges = Job(
+    name="wikimedia_recentchanges",
+    schedule=CronSchedule(
+        quartz_cron_expression="0 */5 * * * ?",
+        timezone_id="UTC",
+        pause_status=PauseStatus.UNPAUSED,
+    ),
+    max_concurrent_runs=1,
+    tasks=[Task(
+        task_key="ingest",
+        spark_python_task=SparkPythonTask(
+            python_file="../../src/dataplay/jobs/wikimedia_recentchanges.py",
+            parameters=[...],          # 본 코드 참조
+        ),
+        environment_key="default",
+    )],
+    environments=[JobEnvironment(
+        environment_key="default",
+        spec=Environment(
+            environment_version="2",
+            dependencies=["requests>=2.32,<3", "pydantic>=2.7,<3"],
+        ),
+    )],
+    email_notifications=JobEmailNotifications(on_failure=[]),
+)
 ```
+
+`resources/__init__.py` 가 `load_resources_from_current_package_module()` 로 `wikimedia_recentchanges`
+변수를 자동 발견한다 — 변수명이 그대로 resource key 가 된다.
 
 **Rationale**:
 - `*/5` cron 은 Quartz 6-field 표현 `0 */5 * * * ?` 으로 표기. UTC 고정으로 DST 영향 없음. spec
@@ -225,6 +240,8 @@ resources:
   부작용 있음. example_job 은 스케줄이 없는 상태이므로 현 시점 영향 없음.
 
 **Alternatives considered**:
+- **YAML 잡 정의**: 가능하나 헌법 I 의 "pydabs 우선" 정책에 어긋남. catalogs/schemas/volumes
+  같은 단순 자산은 YAML 유지, 잡은 pydabs 로 정의 — 본 결정 (revised 2026-05-22).
 - **Classic job_cluster (DBR 16.4)**: 5분마다 클러스터 기동/종료 비용 비효율. 기각 (Complexity #2).
 - **Streaming job (Spark Structured Streaming)**: PySpark 도입 + Action API 가 batch 친화적이라
   부적합. 기각.
