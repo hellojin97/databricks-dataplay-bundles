@@ -159,10 +159,11 @@ databricks.yml                              # 기존; include 에 configuration/
   분리되는 이점.
 - `databricks.yml` 의 `include` 에 `configuration/*.yml` 을 추가해야 카탈로그 정의가 번들에 포함됨
   → Phase 1 Setup 의 첫 task 로 포함.
-- 같은 `databricks.yml` 의 `targets.lab` 에 `presets.trigger_pause_status: UNPAUSED` 와
-  `presets.skip_name_prefix_for_schema: true` 를 추가해야 (a) `*/5` 스케줄이 실제 동작하고 (b)
-  schema 이름이 `bronze` 그대로 유지된다(`mode: development` 의 자동 prefix/pause 해제) — 본
-  내용은 `research.md` R7 의 결정사항.
+- 같은 `databricks.yml` 의 `targets.lab` 에서 **`mode: development` 자체를 제거**해야 (a)
+  `*/5` 스케줄이 실제 동작하고 (b) UC 리소스 이름이 dev prefix 없이 정식 이름(`bronze`,
+  `recentchanges_raw`) 으로 배포된다. DAB CLI 는 dev 모드에서 `trigger_pause_status: UNPAUSED`
+  의 target-level 오버라이드를 안전장치로 거부하므로 — 본 내용은 `research.md` R7 의 결정사항
+  (CI 검증 결과로 2026-05-22 갱신).
 
 ## Complexity Tracking
 

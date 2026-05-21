@@ -92,7 +92,7 @@ databricks bundle deploy   --target lab   # 워크스페이스에 배포
 databricks bundle run example_job --target lab   # 잡 실행
 ```
 
-`mode: development`라 배포된 리소스는 `[dev <you>]` prefix가 붙고 스케줄은 자동 일시정지됩니다(운영 리소스와 격리).
+`lab` target 은 `mode` 를 명시하지 않아 정식 리소스 이름과 활성 스케줄로 배포됩니다 — 본 워크스페이스가 단일 운영 타깃이고 일부 잡(예: `wikimedia_recentchanges`)이 cron 으로 실제 동작해야 하기 때문. 개인 격리가 필요해지면 별도의 `dev` target 을 추가해 `mode: development` 를 거기에 적용하세요.
 
 ---
 

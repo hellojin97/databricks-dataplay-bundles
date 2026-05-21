@@ -162,13 +162,18 @@ include:
 - 자산 정의를 `resources/catalogs.yml` 에 두기: include 패턴이 이미 잡혀있어 편리하나 사용자 명시
   요청을 위배. 기각.
 
-## R7. 잡 정의 (`resources/jobs/wikimedia_recentchanges.py`, pydabs) + `databricks.yml` 의 lab presets
+## R7. 잡 정의 (`resources/jobs/wikimedia_recentchanges.py`, pydabs) + `databricks.yml` 의 lab target
 
 **Decision (revised 2026-05-22)**: 헌법 원칙 I 의 "pydabs 우선" 정책에 따라 잡 정의를
 **`databricks-bundles` Python DSL** 로 작성한다. 서버리스 Python task + cron 트리거의 구조는
 동일하되, YAML 대신 Python 객체로 표현되어 타입 안전·합성·동일 toolchain(ruff/black) 사용이
-가능해진다. **`databricks.yml` 의 `lab` target 에 `presets`** 를 추가해야 본 cron 이 실제 동작
-한다 (advisor 점검 결과; mode:development 의 자동 pause 해제).
+가능해진다.
+
+**`databricks.yml` 의 `lab` target 은 `mode: development` 를 사용하지 않는다.** 본 워크스페이스
+(`dbw-dataplay-lab-kc`)가 단일 운영 타깃이고 `wikimedia_recentchanges` 의 `*/5` cron 이 실제로
+동작해야 하기 때문이다 (FR-002). DAB CLI 는 `mode: development` 일 때 `trigger_pause_status:
+UNPAUSED` 의 target-level 오버라이드를 안전장치로 거부한다 → dev 모드 자체를 끄는 게 깨끗한
+해법 (advisor + CI 검증 결과).
 
 `databricks.yml` 의 `lab` target + pydabs 진입점 골자:
 
@@ -180,11 +185,9 @@ python:
 
 targets:
   lab:
-    mode: development
+    # mode 를 명시하지 않음 — dev 모드의 자동 prefix·schedule 일시정지 회피.
+    # cron 은 Job 자체의 pause_status=UNPAUSED 로 활성, schema 이름은 정식 `bronze` 유지.
     default: true
-    presets:                                       # ← 추가
-      trigger_pause_status: UNPAUSED               # mode:development 의 schedule auto-pause 해제
-      skip_name_prefix_for_schema: true            # UC schema 이름에 dev prefix 가 붙지 않도록
     workspace:
       host: https://adb-7405613177889652.12.azuredatabricks.net/
 ```

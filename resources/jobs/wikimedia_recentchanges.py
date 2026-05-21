@@ -53,8 +53,9 @@ wikimedia_recentchanges = Job(
         Task(
             task_key="ingest",
             spark_python_task=SparkPythonTask(
-                # 잡 번들 루트 기준 상대 경로 — bundle deploy 가 src/ 를 워크스페이스에 업로드.
-                python_file="../../src/dataplay/jobs/wikimedia_recentchanges.py",
+                # pydabs 에서는 번들 루트 기준 경로를 사용 (YAML 처럼 정의 파일 기준이 아님).
+                # bundle deploy 가 src/ 를 워크스페이스에 업로드한 뒤 해당 경로에서 실행.
+                python_file="src/dataplay/jobs/wikimedia_recentchanges.py",
                 parameters=_TASK_PARAMETERS,
             ),
             environment_key="default",

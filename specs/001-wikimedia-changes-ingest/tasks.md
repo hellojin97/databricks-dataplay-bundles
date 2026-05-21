@@ -37,7 +37,7 @@ description: "Task list for 001-wikimedia-changes-ingest"
 **Purpose**: 빌드/실행/테스트 가능한 골격 마련. 본 기능의 1번째 PR 단위에서 모두 한 번에 처리.
 
 - [X] T001 레포 루트에 `pyproject.toml` 신규 생성 (uv 관리, Python `>=3.12`, dependencies = requests + pydantic, dev-group = pytest+ruff+black+responses). 설정 골자는 [research.md R9](./research.md#r9-uv-패키지-매니징--pyprojecttoml-신규) 참조.
-- [X] T002 `databricks.yml` 갱신 — (a) `include` 에 `configuration/*.yml` 와 `configuration/**/*.yml` 추가, (b) `targets.lab` 에 `presets.trigger_pause_status: UNPAUSED` 와 `presets.skip_name_prefix_for_schema: true` 추가 ([research.md R6/R7](./research.md#r7-잡-정의-resourcesjobswikimedia_recentchangesyml--databricksyml-의-lab-presets)).
+- [X] T002 `databricks.yml` 갱신 — (a) `include` 에 `configuration/*.yml` 추가, (b) `python.venv_path: .venv` + `python.resources: ["resources:load_resources"]` 추가 (pydabs 진입점), (c) `targets.lab` 에서 `mode: development` 제거 (2026-05-22 토폴로지 결정 — cron 활성·정식 리소스 이름). [research.md R6/R7](./research.md#r7-잡-정의-resourcesjobswikimedia_recentchangespy-pydabs--databricksyml-의-lab-target).
 - [X] T003 [P] `src/dataplay/__init__.py`, `src/dataplay/jobs/__init__.py`, `src/dataplay/wikimedia/__init__.py` 생성 — 각 파일 최상단에 한국어 모듈 docstring(헌법 VII).
 - [X] T004 [P] `tests/__init__.py`, `tests/unit/__init__.py`, `tests/integration/__init__.py` 신규 (빈 파일 가능).
 - [X] T005 [P] `tests/conftest.py` 작성 — 공용 fixture: `frozen_now`(테스트용 UTC datetime), `tmp_volume_root`(tmp_path 기반 볼륨 루트).
