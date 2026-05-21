@@ -43,9 +43,6 @@ jobs:
                   enable-cache: true
             - run: uv sync --frozen
             - uses: databricks/setup-cli@main
-            # 일회성: 이전 terraform 엔진 state 를 청소. direct 엔진으로 새 state 를 생성하기 위해 필요.
-            # 본 step 은 다음 deploy 성공 후 별도 commit 으로 제거 예정.
-            - run: databricks bundle destroy --auto-approve --target lab
             - run: databricks bundle validate --target lab
             - run: databricks bundle deploy --target lab
             - name: Notify Discord
